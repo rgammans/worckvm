@@ -1,0 +1,42 @@
+[project]
+name = "worckvm"
+description = "A kvm switch controller using worchestic"
+version = "0.1.0"
+readme = "README.rst"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Roger Gammans", email = "rgammans@gammascience.co.uk"},
+]
+keywords = ['kvm', 'hardware' ]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 2 - Pre-Alpha",
+    "Topic :: Other/Nonlisted Topic"
+]
+dependencies = [
+    "worchestic",
+    "pyyaml"
+]
+
+[build-system]
+requires = ["setuptools", "wheel" ]
+build-backend = "setuptools.build_meta"
+
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
+
+    envlist = py38,py39,py310,py311
+
+    [testenv]
+    commands = 
+        python -m unittest discover -s tests
+
+    [gh-actions]
+    python =
+        3.8: py38
+        3.9: py39
+        3.10: py310
+        3.11: py311
+"""
