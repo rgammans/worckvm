@@ -1,0 +1,5 @@
+test: !!python/object &test
+
+data:
+    - *test
+    - *test.a
