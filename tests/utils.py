@@ -26,13 +26,13 @@ def create_fabric():
     hid = [make_signal(), make_signal(), make_signal(), make_signal()]
     mat_video = Matrix("video", MockDriver(), video, 3)
     mat_hid = Matrix("hid", MockDriver(), hid, 1)
+    for s in hid:
+        s.preferred_out = mat_hid.outputs[0]
+    for idx, s in enumerate(video):
+        s.preferred_out = mat_video.outputs[idx % 2]
     siggrp = SourceGroup(
         video=video,
         hid=hid,
-#        assign_outputs={
-#            'video': mat_video.outputs[0],
-#            'hid': mat_hid.outputs[0],
-#        }
     )
     return {
         'matrixgrp': MatrixGroup(
@@ -41,6 +41,7 @@ def create_fabric():
             hid=mat_hid
         ),
         'video0': video[0],
+        'video2': video[2],
         'hid0': hid[0],
         'hid1': hid[1],
     }

@@ -22,6 +22,7 @@ class Adjacency(Enum):
         return self.__class__(self.value ^ 1)
 
 
+
 class Monitor:
     """A monitor represent a sink for a source, and is normally
     statically connected to a single MatrixOutput
@@ -76,15 +77,29 @@ class Monitor:
         return self.neighbours.get(direction)
 
     def grab_hid(self):
-        return None
+        companions = self.matrixgrp.signals.get_companions(self.output.source)
+        current_hid = self.matrixgrp.get_output(
+            self.hid_group_name, self.hid_output_idx
+        )
+        if not (current_hid.source in companions):
+            # HID is not one ouf our companions.
+            # so find a HId routeable companion
+            hids = self.matrixgrp.available(self.hid_group_name)
+            my_hid = _first(hids & companions)
+            self.matrixgrp.select(
+                self.hid_group_name,
+                self.hid_output_idx,
+                my_hid, no_companions=True  # don't encourage other changes.
+            )
+            current_hid = self.matrixgrp.get_output(
+                self.hid_group_name, self.hid_output_idx
+            )
 
     def get_status(self):
         companions = self.matrixgrp.signals.get_companions(self.output.source)
         current_hid = self.matrixgrp.get_output(
             self.hid_group_name, self.hid_output_idx
         )
-        print("E")
-        print(f"hid current:{current_hid.source}, vid companions: {companions}")
         return self.Status(
             source=self.output.source,
             has_hid=(current_hid.source in companions)
@@ -92,3 +107,14 @@ class Monitor:
 
     def select(self, source):
         self.matrixgrp.select(self.video_group_name, self.video_out_idx, source)
+
+    def available_sources(self):
+        src = self.matrixgrp.available(self.video_group_name)
+        return (  # Bracket to allow wrapping..
+            [s for s in src if s.preferred_out is self.output] +
+            [s for s in src if s.preferred_out is not self.output]
+        )
+
+def _first(seq):
+    "returns the first element in a seq"
+    return next(iter(seq))

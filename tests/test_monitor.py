@@ -38,7 +38,6 @@ class MonitorTests(TestCase):
     def tearDown(self):
         logging.getLogger("worckvm").setLevel(logging.WARN)
 
-    @expectedFailure
     def test_monitr_has_get_status_which_show_which_source_is_routed(self):
         logging.getLogger().setLevel(logging.DEBUG)
         print("X")
@@ -58,13 +57,12 @@ class MonitorTests(TestCase):
             source=self.video0, has_hid=False)
         self.assertEqual(status, expected_status)
 
-    @expectedFailure
     def test_monitor_has_function_to_route_the_hid(self):
         self.matrixgrp.select('video', 0, self.video0)
-        self.matrixgrp.select('hid', 0, self.hid1)
-        with patch.object(self.matrixgrp, 'select') as msel:
+        self.matrixgrp.select('hid', 0, self.hid1, no_companions=True)
+        with patch.object(self.matrixgrp, 'select', wraps=self.matrixgrp.select) as msel:
             self.monitor.grab_hid()
-        msel.assert_called_with('hid', 0, self.hid0)
+        msel.assert_called_with('hid', 0, self.hid0, no_companions=True)
         status = self.monitor.get_status()
         expected_status = Monitor.Status(
             source=self.video0,
@@ -78,7 +76,13 @@ class MonitorTests(TestCase):
         outsel.assert_called_once_with(sentinel.SOURCE, nolock=True)
 
     def test_monitor_has_available_sources_which_sorts_Source_with_monitor_as_preferred_out_first(self):
-        pass
+        srcs = self.monitor.available_sources()
+        self.assertEqual(len(srcs), 4)
+        self.assertIs(srcs[0].preferred_out, self.monitor.output)
+        self.assertIs(srcs[1].preferred_out, self.monitor.output)
+        self.assertIsNot(srcs[2].preferred_out, self.monitor.output)
+        self.assertIsNot(srcs[3].preferred_out, self.monitor.output)
+
 
     def test_monitor_may_have_another_monitor_in_a_particular_driection(self):
         mon2 = self.monitor.neighbour_to(Adjacency.LEFT)
@@ -91,4 +95,3 @@ class MonitorTests(TestCase):
     def test_two_monitors_cant_be_to_the_left_of_the_same_one(self):
         with self.assertRaises(InconsistentLayout):
             Monitor(self.matrixgrp, 2, to_right=self.monitor)
-
