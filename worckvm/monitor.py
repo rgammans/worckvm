@@ -1,4 +1,5 @@
 from enum import Enum
+import uuid
 from dataclasses import dataclass
 from typing import ForwardRef
 from worchestic.matrix import InputSignal
@@ -32,6 +33,7 @@ class Monitor:
     can be used for UI hinting, but has little direct use.
     mostly
     """
+    _registry = {}
 
     @dataclass
     class Status:
@@ -53,6 +55,7 @@ class Monitor:
         @param: hid_group_name str: The idx of the output of thre hid sub
                     matrix used for this monitor's hid companions
         """
+        self.uuid = self.register(self)
         self.matrixgrp = matrixgrp
         self.video_out_idx = video_out_idx
         self.video_group_name = video_group_name
@@ -65,6 +68,28 @@ class Monitor:
                 opdir = direction.opposite()
                 neighbour.set_neighbour(opdir, self)
                 self.neighbours[direction] = neighbour
+
+    @classmethod
+    def register(kls, self):
+        guid = uuid.uuid4()
+        kls._registry[guid] = self
+        return guid
+
+    @classmethod
+    def list(kls):
+        return kls._registry.values()
+
+    @classmethod
+    def reset_registry(kls):
+        """Forget all previous;y created monitors.
+
+        mostly useful of ensuring tests are indepedent
+        """
+        kls._registry = {}
+
+    @classmethod
+    def get(kls, guid):
+        return kls._registry[guid]
 
     def set_neighbour(self, direction: Adjacency, neighbour: ForwardRef('Monitor')):
         if extant := self.neighbour_to(direction) is not None:

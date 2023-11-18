@@ -26,6 +26,7 @@ class AdjacencyTests(TestCase):
 
 class MonitorTests(TestCase):
     def setUp(self):
+        Monitor.reset_registry()
         self.__dict__.update(create_fabric())
         self.monitor = Monitor(
             self.matrixgrp, 0
@@ -95,3 +96,13 @@ class MonitorTests(TestCase):
     def test_two_monitors_cant_be_to_the_left_of_the_same_one(self):
         with self.assertRaises(InconsistentLayout):
             Monitor(self.matrixgrp, 2, to_right=self.monitor)
+
+    def test_that_the_monitor_class_lists_created_monitors(self):
+        monitors = Monitor.list()
+        self.assertEqual(len(monitors), 2)
+        self.assertSetEqual(set(monitors),
+                            set([self.monitor, self.left_monitor]))
+
+    def test_that_the_monitor_class_has_get_byuuid_classmethod(self):
+        monitor = Monitor.get(self.monitor.uuid)
+        self.assertIs(monitor, self.monitor)
