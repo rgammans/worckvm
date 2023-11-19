@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 class InconsistentLayout(ValueError):
     pass
-
+class NoMatchingHIDFound(ValueError):
+    pass
 
 class Adjacency(Enum):
     LEFT = 0b00
@@ -110,7 +111,10 @@ class Monitor:
             # HID is not one ouf our companions.
             # so find a HId routeable companion
             hids = self.matrixgrp.available(self.hid_group_name)
-            my_hid = _first(hids & companions)
+            try:
+                my_hid = _first(hids & companions)
+            except StopIteration:
+                raise NoMatchingHIDFound(companions)
             self.matrixgrp.select(
                 self.hid_group_name,
                 self.hid_output_idx,
