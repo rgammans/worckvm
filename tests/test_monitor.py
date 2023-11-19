@@ -6,6 +6,7 @@ from worckvm.monitor import (
     Monitor,
     Adjacency,
     InconsistentLayout,
+    NoMatchingHIDFound,
 )
 from utils import create_fabric
 
@@ -58,6 +59,11 @@ class MonitorTests(TestCase):
             source=self.video0, has_hid=False)
         self.assertEqual(status, expected_status)
 
+    def test_monitor_trying_to_route_the_hid_with_no_matching_hid_raises_an_exception(self):
+        self.matrixgrp.select('video', 0, self.video3)
+        with self.assertRaises(NoMatchingHIDFound):
+            self.monitor.grab_hid()
+
     def test_monitor_has_function_to_route_the_hid(self):
         self.matrixgrp.select('video', 0, self.video0)
         self.matrixgrp.select('hid', 0, self.hid1, no_companions=True)
@@ -78,12 +84,12 @@ class MonitorTests(TestCase):
 
     def test_monitor_has_available_sources_which_sorts_Source_with_monitor_as_preferred_out_first(self):
         srcs = self.monitor.available_sources()
+        print("Mt-as", srcs)
         self.assertEqual(len(srcs), 4)
         self.assertIs(srcs[0].preferred_out, self.monitor.output)
         self.assertIs(srcs[1].preferred_out, self.monitor.output)
         self.assertIsNot(srcs[2].preferred_out, self.monitor.output)
         self.assertIsNot(srcs[3].preferred_out, self.monitor.output)
-
 
     def test_monitor_may_have_another_monitor_in_a_particular_driection(self):
         mon2 = self.monitor.neighbour_to(Adjacency.LEFT)
