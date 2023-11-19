@@ -2,7 +2,7 @@ from enum import Enum
 import uuid
 from dataclasses import dataclass
 from typing import ForwardRef
-from worchestic.matrix import InputSignal
+from worchestic.signals import Source
 import logging
 
 
@@ -38,7 +38,7 @@ class Monitor:
 
     @dataclass
     class Status:
-        source: InputSignal
+        source: Source
         has_hid: bool
 
     def __init__(self, matrixgrp, video_out_idx: int,
