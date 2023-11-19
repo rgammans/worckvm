@@ -6,6 +6,7 @@ from typing import List
 from worchestic.matrix import Matrix
 from worchestic.group import SourceGroup, MatrixGroup
 from worchestic.signals import Source
+from .monitor import Monitor
 
 _matrixes = {}
 
@@ -21,6 +22,9 @@ class NoSuchMatrix(KeyError):
 
 class DuplicateSourceType(ValueError):
     """A sourceset can only contain a single source of each type"""
+
+class MatrixNotInGroup(ValueError):
+    """A Monitor's video must be connected to a matrix in it's matrixgroup"""
 
 def set_matrix(name, matrix):
     global _matrixes
@@ -44,6 +48,7 @@ def yaml_tag(name: str):
 @yaml_tag("Matrix")
 def build_matrix(loader, node):
     data = loader.construct_mapping(node)
+    print("MX-data", data)
     name = data.get('name')
     namestr = data.get('name', "<Matrix:unknown")
     m = Matrix(
@@ -82,11 +87,13 @@ class MatrixInputProxy:
 @yaml_tag("MatrixGroup")
 def matrixgroup(loader, node):
     data = loader.construct_mapping(node, deep=True)
+    print("MG-data", data)
     mats = {}
 
     # Process matricies
     try:
         for matrix_name in data['matricies']:
+            print("MG-MN", matrix_name)
             mats[matrix_name] = get_matrix(matrix_name)
     except KeyError as e:
         raise MissingConfigKey(*e.args)
@@ -96,6 +103,7 @@ def matrixgroup(loader, node):
     grp_len = len(data['sources'])
     for idx, srcset in enumerate(data['sources']):
         for src_type, src in srcset.sources.items():
+            print("MGss- ", src)
             # Assign each source to a SourceGroup type, using the sourceset idx
             # as the soruce idx in that group
             groups.setdefault(src_type, [None] * grp_len)[idx] = src
@@ -103,11 +111,33 @@ def matrixgroup(loader, node):
     return MatrixGroup(SourceGroup(**groups), **mats)
 
 
+@yaml_tag("Monitor")
+def make_monitor(loader, node):
+    data = loader.construct_mapping(node, deep=True)
+    matrixgrp = data['matrix_group']
+
+    def find_matrix_groupname(output):
+        for name, mat in matrixgrp.matricies.items():
+            if mat is output.port[0]:
+                return name
+        else:
+            raise MatrixNotInGroup(output.port[0].name)
+
+    vid_out = data['connected_to']
+    hid_out = data['hid_output']
+    return Monitor(
+        matrixgrp,
+        vid_out.port[1], find_matrix_groupname(vid_out),
+        find_matrix_groupname(hid_out), hid_out.port[1]
+    )
+    # TODO Neighours
+
 @yaml_tag("SourceSet")
 class SourceSet:
     ""
     def __init__(self, loader, node):
         data = loader.construct_mapping(node, deep=True)
+        print("SS-data", data)
         self.name = data['name']
         self.sources = {}
         for src in data['sources']:
@@ -124,7 +154,5 @@ class SourceSet:
 
 
 
-
-
-def loads(str_data: str):
+def loads(str_data: str):   
     return yaml.full_load(io.StringIO(str_data))

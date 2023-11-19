@@ -7,6 +7,7 @@ from worchestic.signals import Source
 from worchestic.group import SourceGroup, MatrixGroup
 
 from worckvm import config
+from worckvm.monitor import Monitor
 
 
 class ConfigTest(TestCase):
@@ -257,3 +258,137 @@ class ConfigTest(TestCase):
                          {"video", "hid"})
         self.assertEqual(system[4].signals.groups['video'][0].name,
                          "Gaming PC HDMI")
+
+    def test_config_can_create_a_monitor(self):
+        system = config.loads("""
+- !Matrix
+  name: "video"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !Matrix
+  name: "hid"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !MatrixOutput &video
+  matrix_name: "video"
+  output_idx: 0
+
+- !MatrixOutput &hid
+  matrix_name: "hid"
+  output_idx:  0
+
+- !MatrixGroup &grp
+  matricies: [ "video", "hid" ]
+  sources:
+  - !SourceSet
+    name: "Gaming PC"
+    sources:
+      - type: "video"
+        name: Gaming PC HDMI
+        preferred_output: *video
+        connected_to: !MatrixInput
+            matrix_name: "video"
+            input_idx: 1
+
+      - type: "hid"
+        preferred_output: *hid
+        connected_to: !MatrixInput
+            matrix_name: "hid"
+            input_idx: 1
+
+  - !SourceSet
+    name: "Mac"
+    sources:
+        - type: "video"
+          preferred_output: *video
+          connected_to: !MatrixInput
+              matrix_name: "video"
+              input_idx: 2
+
+        - type: "hid"
+          preferred_output: *hid
+          connected_to: !MatrixInput
+              matrix_name: "hid"
+              input_idx: 2
+
+
+- !Monitor
+  name: foo
+  matrix_group: *grp
+  connected_to: *video
+  hid_output: *hid
+        """)
+        self.assertIsInstance(system[-1], Monitor)
+        self.assertIs(system[-1].output, system[2])
+
+    def test_monitor_creation_raises_if_not_connected_to_the_provided_group(self):
+        with self.assertRaises(config.MatrixNotInGroup):
+            config.loads("""
+- !Matrix
+  name: "video"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !Matrix
+  name: "alt"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !Matrix
+  name: "hid"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !MatrixOutput &video
+  matrix_name: "video"
+  output_idx: 0
+
+- !MatrixOutput &hid
+  matrix_name: "hid"
+  output_idx:  0
+
+- !MatrixGroup &grp
+  matricies: [ "video", "hid" ]
+  sources:
+  - !SourceSet
+    name: "Gaming PC"
+    sources:
+      - type: "video"
+        name: Gaming PC HDMI
+        preferred_output: *video
+        connected_to: !MatrixInput
+            matrix_name: "video"
+            input_idx: 1
+
+      - type: "hid"
+        preferred_output: *hid
+        connected_to: !MatrixInput
+            matrix_name: "hid"
+            input_idx: 1
+
+  - !SourceSet
+    name: "Mac"
+    sources:
+        - type: "video"
+          preferred_output: *video
+          connected_to: !MatrixInput
+              matrix_name: "video"
+              input_idx: 2
+
+        - type: "hid"
+          preferred_output: *hid
+          connected_to: !MatrixInput
+              matrix_name: "hid"
+              input_idx: 2
+
+- !Monitor
+  name: foo
+  matrix_group: *grp
+  connected_to:
+        !MatrixOutput
+        matrix_name: alt
+        output_idx: 0
+  hid_output: *hid
+            """)
