@@ -138,10 +138,13 @@ class Monitor:
         self.matrixgrp.select(self.video_group_name, self.video_out_idx, source)
 
     def available_sources(self):
+        
         src = self.matrixgrp.available(self.video_group_name)
+        
+        # added test for None in src list..
         return (  # Bracket to allow wrapping..
-            [s for s in src if s.preferred_out is self.output] +
-            [s for s in src if s.preferred_out is not self.output]
+            [s for s in src if s is not None and s.preferred_out is self.output] +
+            [s for s in src if s is not None and s.preferred_out is not self.output]
         )
 
 def _first(seq):
