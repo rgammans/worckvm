@@ -1,0 +1,79 @@
+# Hardware config
+# connections
+- !Matrix
+  name: "video"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !Matrix
+  name: "hid"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !MatrixOutput &video
+  matrix_name: "video"
+  output_idx: 0
+
+- !MatrixOutput &hid
+  matrix_name: "hid"
+  output_idx: 0
+
+- !MatrixGroup &grp
+  matricies:
+    - video
+    - hid
+
+  sources:
+    - !SourceSet
+      name: "Linux PC"
+      sources:
+          - type: "video"
+            preferred_output: *video
+            connected_to: !MatrixInput
+                matrix_name: "video"
+                input_idx: 0
+    
+          - type: "hid"
+            preferred_output: *hid
+            connected_to: !MatrixInput
+                matrix_name: "hid"
+                input_idx: 0
+    
+    - !SourceSet
+      name: "Gaming PC"
+      sources:
+          - type: "video"
+            preferred_output: *video
+            connected_to: !MatrixInput
+                matrix_name: "video"
+                input_idx: 1
+      
+          - type: "hid"
+            preferred_output: *hid
+            connected_to: !MatrixInput
+                matrix_name: "hid"
+                input_idx: 1
+      
+    - !SourceSet
+      name: "Mac"
+      sources:
+          - type: "video"
+            preferred_output: *video
+            connected_to: !MatrixInput
+                matrix_name: "video"
+                input_idx: 2
+    
+          - type: "hid"
+            preferred_output: *hid
+            connected_to: !MatrixInput
+                matrix_name: "hid"
+                input_idx: 2
+
+
+- !Monitor
+  name: "Main Monitor"
+  matrix_group: *grp
+  connected_to: *video
+  hid_output: *hid
+
+
