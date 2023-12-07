@@ -9,9 +9,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class InconsistentLayout(ValueError):
+class WorcKVMError(Exception):
     pass
-class NoMatchingHIDFound(ValueError):
+
+class InconsistentLayout(ValueError, WorcKVMError):
+    pass
+class NoMatchingHIDFound(ValueError, WorcKVMError):
     pass
 
 class Adjacency(Enum):

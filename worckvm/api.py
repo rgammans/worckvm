@@ -1,7 +1,6 @@
 from .monitor import Monitor
 from typing import List, Dict
 from . import serialisers as ser
-#import Source, MonitorStatus
 
 
 def get_status(monitor) -> ser.MonitorStatus:
@@ -17,10 +16,10 @@ def available_sources(monitor) -> List[ser.Source]:
     return monitor.available_sources()
 
 
-def select(monitor, src: ser.Source):
-    monitor.select(src)
+def select(monitor, source):
+    monitor.select(source)
 
-#
+
 def list_monitor() -> List[ser.Monitor]:
     return [
         ser.Monitor(
