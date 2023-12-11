@@ -17,7 +17,7 @@ class MonitorStatus(BaseModel):
     def of(kls, monitor: monitor.Monitor):
         status = monitor.get_status()
         return kls(
-            source=status.source,
+            source=status.source and status.source.__dict__,
             has_hid=status.has_hid
         )
 
@@ -27,4 +27,3 @@ class Monitor(BaseModel):
     uuid: uuid.UUID
     status: MonitorStatus
     neighbours: dict[monitor.Adjacency, 'Monitor']
-
