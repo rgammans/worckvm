@@ -5,10 +5,6 @@ from starlette.convertors import Convertor, register_url_convertor
 from worchestic.signals import Source
 from . import api
 from .monitor import Monitor, WorcKVMError
-from .config import loads
-
-app = FastAPI()
-system = loads(open("examples/simple_kvm_combined.yaml").read())
 
 
 class UuidToObject:
@@ -40,12 +36,17 @@ class SourceConverter(UuidToObject, Convertor):
     my_type = Source
 register_url_convertor("Source", SourceConverter)  # noqa: E305
 
+
+app = FastAPI()
+
+
 @app.exception_handler(WorcKVMError)
 async def worc_errors(req: Request, error: WorcKVMError):
     return JSONResponse(
         status_code=400,
         content={"detail": {"error": f"{type(error).__name__} : {error}"}}
     )
+
 
 app.post('/monitor/{monitor:Monitor}/grabhid')(api.grab_hid)
 app.post('/monitor/{monitor:Monitor}/select/{source:Source}')(api.select)

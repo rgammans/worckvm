@@ -2,11 +2,13 @@
 # connections
 - !Matrix
   name: "video"
+  driver: "mock"
   nr_inputs: 4
   nr_outputs: 1
 
 - !Matrix
   name: "hid"
+  driver: "mockhid"
   nr_inputs: 4
   nr_outputs: 1
 
