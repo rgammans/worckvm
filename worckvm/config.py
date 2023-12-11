@@ -1,5 +1,6 @@
 import io
 import yaml
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import List
 
@@ -7,6 +8,7 @@ from worchestic.matrix import Matrix
 from worchestic.group import SourceGroup, MatrixGroup
 from worchestic.signals import Source
 from .monitor import Monitor
+from .matrixdriver import Driver
 
 _matrixes = {}
 
@@ -51,9 +53,12 @@ def build_matrix(loader, node):
     print("MX-data", data)
     name = data.get('name')
     namestr = data.get('name', "<Matrix:unknown")
+    driver = None
+    with suppress(KeyError):
+        driver = Driver.get(data.get('driver'))
     m = Matrix(
         namestr,
-        None,   # TODO Driver
+        driver,
         [None] * data['nr_inputs'],
         data['nr_outputs']
     )

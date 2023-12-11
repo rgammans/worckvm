@@ -8,7 +8,7 @@ from worchestic.group import SourceGroup, MatrixGroup
 
 from worckvm import config
 from worckvm.monitor import Monitor
-
+from worckvm.matrixdriver import Driver
 
 class ConfigTest(TestCase):
     def setUp(self):
@@ -37,6 +37,19 @@ class ConfigTest(TestCase):
         self.assertTrue(isinstance(system, Matrix))
         self.assertEqual(len(system.inputs), 6)
         self.assertEqual(len(system.outputs), 2)
+
+    def test_matrix_creation_with_driver(self):
+        driver = Driver(name="test_driver")
+        system = config.loads("""
+- !Matrix
+  name: "video"
+  driver: test_driver
+  nr_inputs: 6
+  nr_outputs: 2
+""")[0]
+        self.assertTrue(isinstance(system, Matrix))
+        self.assertIs(system._driver, driver)
+
 
     def test_matrix_output_reference(self):
         system = config.loads("""
