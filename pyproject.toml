@@ -16,8 +16,15 @@ classifiers = [
 ]
 dependencies = [
     "worchestic",
-    "pyyaml"
+    "pyyaml",
+    "pydantic",
 ]
+
+[project.optional-dependencies]
+http= [
+    "fastapi"
+]
+
 
 [build-system]
 requires = ["setuptools", "wheel" ]
