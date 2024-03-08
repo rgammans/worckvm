@@ -50,7 +50,6 @@ def yaml_tag(name: str):
 @yaml_tag("Matrix")
 def build_matrix(loader, node):
     data = loader.construct_mapping(node)
-    print("MX-data", data)
     name = data.get('name')
     namestr = data.get('name', "<Matrix:unknown")
     driver = None
@@ -92,13 +91,11 @@ class MatrixInputProxy:
 @yaml_tag("MatrixGroup")
 def matrixgroup(loader, node):
     data = loader.construct_mapping(node, deep=True)
-    print("MG-data", data)
     mats = {}
 
     # Process matricies
     try:
         for matrix_name in data['matricies']:
-            print("MG-MN", matrix_name)
             mats[matrix_name] = get_matrix(matrix_name)
     except KeyError as e:
         raise MissingConfigKey(*e.args)
@@ -108,7 +105,6 @@ def matrixgroup(loader, node):
     grp_len = len(data['sources'])
     for idx, srcset in enumerate(data['sources']):
         for src_type, src in srcset.sources.items():
-            print("MGss- ", src)
             # Assign each source to a SourceGroup type, using the sourceset idx
             # as the soruce idx in that group
             groups.setdefault(src_type, [None] * grp_len)[idx] = src
@@ -133,7 +129,8 @@ def make_monitor(loader, node):
     return Monitor(
         matrixgrp,
         vid_out.port[1], find_matrix_groupname(vid_out),
-        find_matrix_groupname(hid_out), hid_out.port[1]
+        find_matrix_groupname(hid_out), hid_out.port[1],
+        name = data.get('name', '')
     )
     # TODO Neighours
 
@@ -142,7 +139,6 @@ class SourceSet:
     ""
     def __init__(self, loader, node):
         data = loader.construct_mapping(node, deep=True)
-        print("SS-data", data)
         self.name = data['name']
         self.sources = {}
         for src in data['sources']:

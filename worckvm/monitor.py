@@ -67,6 +67,7 @@ class Monitor:
         self.hid_group_name = hid_group_name
         self.output = matrixgrp.get_output(video_group_name, video_out_idx)
         self.neighbours = {}
+        self.name = kwargs.pop('name', '')
         for direction in Adjacency:
             if neighbour := kwargs.get(f"to_{direction.name.lower()}"):
                 opdir = direction.opposite()

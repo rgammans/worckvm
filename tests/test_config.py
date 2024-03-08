@@ -335,6 +335,7 @@ class ConfigTest(TestCase):
         """)
         self.assertIsInstance(system[-1], Monitor)
         self.assertIs(system[-1].output, system[2])
+        self.assertEqual(system[-1].name, "foo")
 
     def test_monitor_creation_raises_if_not_connected_to_the_provided_group(self):
         with self.assertRaises(config.MatrixNotInGroup):
