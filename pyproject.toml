@@ -21,8 +21,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-http= [
+http = [
     "fastapi"
+]
+ble = [
+    "dbus-python",
+    "gobject"
+]
+cli = [
+    "typer"
 ]
 
 
