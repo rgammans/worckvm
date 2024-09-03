@@ -7,7 +7,7 @@ from worchestic.signals import Source
 from worchestic.group import SourceGroup, MatrixGroup
 
 from worckvm import config
-from worckvm.monitor import Monitor
+from worckvm.monitor import Monitor, Adjacency
 from worckvm.matrixdriver import Driver
 
 class ConfigTest(TestCase):
@@ -406,3 +406,83 @@ class ConfigTest(TestCase):
         output_idx: 0
   hid_output: *hid
             """)
+
+    def test_monitor_creation_adjacenny_works(self):
+        system = config.loads("""
+- !Matrix
+  name: "video"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !Matrix
+  name: "hid"
+  nr_inputs: 4
+  nr_outputs: 1
+
+- !MatrixOutput &video
+  matrix_name: "video"
+  output_idx: 0
+
+- !MatrixOutput &hid
+  matrix_name: "hid"
+  output_idx:  0
+
+- !MatrixGroup &grp
+  matricies: [ "video", "hid" ]
+  sources:
+  - !SourceSet
+    name: "Gaming PC"
+    sources:
+      - type: "video"
+        name: Gaming PC HDMI
+        preferred_output: *video
+        connected_to: !MatrixInput
+            matrix_name: "video"
+            input_idx: 1
+
+      - type: "hid"
+        preferred_output: *hid
+        connected_to: !MatrixInput
+            matrix_name: "hid"
+            input_idx: 1
+
+  - !SourceSet
+    name: "Mac"
+    sources:
+        - type: "video"
+          preferred_output: *video
+          connected_to: !MatrixInput
+              matrix_name: "video"
+              input_idx: 2
+
+        - type: "hid"
+          preferred_output: *hid
+          connected_to: !MatrixInput
+              matrix_name: "hid"
+              input_idx: 2
+
+- !Monitor &leftmonitor
+  name: foo
+  matrix_group: *grp
+  connected_to:
+        !MatrixOutput
+        matrix_name: video
+        output_idx: 0
+  hid_output: *hid
+
+- !Monitor &rightmonitor
+  name: bar
+  matrix_group: *grp
+  connected_to:
+        !MatrixOutput
+        matrix_name: video
+        output_idx: 0
+  to_left: *leftmonitor
+  hid_output: *hid
+
+- !Layout
+  monitor: *leftmonitor
+  to_left: *rightmonitor
+            """)
+        self.assertEqual(system[-2].neighbour_to(Adjacency.LEFT), system[-3])
+        self.assertEqual(system[-3].neighbour_to(Adjacency.RIGHT), system[-2])

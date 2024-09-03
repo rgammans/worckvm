@@ -7,7 +7,7 @@ from typing import List
 from worchestic.matrix import Matrix
 from worchestic.group import SourceGroup, MatrixGroup
 from worchestic.signals import Source
-from .monitor import Monitor
+from .monitor import Monitor, Adjacency
 from .matrixdriver import Driver
 
 _matrixes = {}
@@ -112,6 +112,19 @@ def matrixgroup(loader, node):
     return MatrixGroup(SourceGroup(**groups), **mats)
 
 
+@yaml_tag("Layout")
+def set_layout(loader, node):
+    data = loader.construct_mapping(node, deep=True)
+    main_monitor = data['monitor']
+
+    for direction in Adjacency:
+        label = f"to_{direction.name.lower()}"
+        if neighbour := data.get(label):
+            main_monitor.set_neighbour(direction, neighbour)
+
+    return None
+
+
 @yaml_tag("Monitor")
 def make_monitor(loader, node):
     data = loader.construct_mapping(node, deep=True)
@@ -126,13 +139,21 @@ def make_monitor(loader, node):
 
     vid_out = data['connected_to']
     hid_out = data['hid_output']
+    extra = {}
+
+    for direction in Adjacency:
+        label = f"to_{direction.name.lower()}"
+        if neighbour := data.get(label):
+            extra[label] = neighbour
+
     return Monitor(
         matrixgrp,
         vid_out.port[1], find_matrix_groupname(vid_out),
         find_matrix_groupname(hid_out), hid_out.port[1],
-        name = data.get('name', '')
+        name=data.get('name', ''),
+        **extra
     )
-    # TODO Neighours
+
 
 @yaml_tag("SourceSet")
 class SourceSet:
