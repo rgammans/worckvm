@@ -97,7 +97,7 @@ class Monitor:
         return kls._registry[guid]
 
     def set_neighbour(self, direction: Adjacency, neighbour: ForwardRef('Monitor')):
-        if extant := self.neighbour_to(direction) is not None:
+        if (extant := self.neighbour_to(direction)) is not None:
             raise InconsistentLayout(
                 f"{extant} is already {direction} from {self}"
             )
