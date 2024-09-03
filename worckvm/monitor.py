@@ -148,6 +148,9 @@ class Monitor:
             [s for s in src if s.preferred_out is not self.output]
         )
 
+    def __str__(self):
+        return self.name or str(self.uuid)
+
 def _first(seq):
     "returns the first element in a seq"
     return next(iter(seq))
