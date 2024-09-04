@@ -1,10 +1,11 @@
 import uuid
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.convertors import Convertor, register_url_convertor
 from worchestic.signals import Source
-from . import api
-from .monitor import Monitor, WorcKVMError
+import api , config
+from monitor import Monitor, WorcKVMError
 
 
 class UuidToObject:
@@ -39,6 +40,15 @@ register_url_convertor("Source", SourceConverter)  # noqa: E305
 
 app = FastAPI()
 
+# added to allow expo web to work on local machine
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+
 
 @app.exception_handler(WorcKVMError)
 async def worc_errors(req: Request, error: WorcKVMError):
@@ -53,3 +63,5 @@ app.post('/monitor/{monitor:Monitor}/select/{source:Source}')(api.select)
 app.get('/monitor/{monitor:Monitor}/status')(api.get_status)
 app.get('/monitor/{monitor:Monitor}/available')(api.available_sources)
 app.get('/monitors/')(api.list_monitor)
+
+system = config.loads(open("../examples/dual_complex_kvm.yaml").read())

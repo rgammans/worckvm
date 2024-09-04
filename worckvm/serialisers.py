@@ -1,7 +1,9 @@
 import uuid
-from typing import Union
-from . import monitor
-from pydantic import BaseModel
+from typing import Union, List, Dict, Optional
+from typing_extensions import TypedDict
+import monitor
+import uuid
+from pydantic import BaseModel, SerializeAsAny
 
 
 class Source(BaseModel):
@@ -19,11 +21,12 @@ class MonitorStatus(BaseModel):
         return kls(
             source=status.source and status.source.__dict__,
             has_hid=status.has_hid
-        )
-
+        )       
 
 class Monitor(BaseModel):
     name: str
     uuid: uuid.UUID
     status: MonitorStatus
-    neighbours: dict[monitor.Adjacency, 'Monitor']
+    neighbours: Dict[monitor.Adjacency, uuid.UUID] = {} # Recursive definition
+
+

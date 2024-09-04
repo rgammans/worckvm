@@ -1,6 +1,6 @@
-from .monitor import Monitor
+from monitor import Monitor
 from typing import List, Dict
-from . import serialisers as ser
+import serialisers as ser
 
 
 def get_status(monitor) -> ser.MonitorStatus:
@@ -23,10 +23,10 @@ def select(monitor, source):
 def list_monitor() -> List[ser.Monitor]:
     return [
         ser.Monitor(
-            name="",
+            name=m.name,
             uuid=m.uuid,
             status=ser.MonitorStatus.of(m),
-            neighbours=m.neighbours
+            neighbours={k: v.uuid for k, v in m.neighbours.items()},
         )
         for m in Monitor.list()
     ]

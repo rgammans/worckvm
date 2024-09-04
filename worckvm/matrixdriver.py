@@ -13,4 +13,5 @@ class Driver:
         return kls._registry[name]
 
     def select(self, inp, out):
-        raise NotImplementedError("Implement this is you own driver")
+        pass
+        #raise NotImplementedError("Implement this is you own driver")
