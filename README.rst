@@ -19,3 +19,39 @@ ensure the HID follows the video.
 
 The essence of worcKVM's control strategy is that each monitor is
 potentially independent,..
+
+Switches Configuration
+======================
+
+The KVM setup supports two types of switches:
+
+* Video Matrix: Manages video connections between multiple sources and displays
+* HID Switch: Controls the routing of keyboard and mouse, usually USB.
+
+The switches are defined in a YAML configuration file that specifies their properties
+and connection points.
+
+Example Usage
+=============
+
+To run the WorcKVM controller, use the following command:
+
+.. code-block:: bash
+
+    python -m worckvm --matrix-def ./examples/simple_kvm_combined.yaml http
+
+The ``--matrix-def`` parameter specifies the YAML configuration file for your switch setup.
+Adding ``http`` enables the HTTP interface for remote control capabilities. Future improvements
+is intended to add a ble interface for remote control as well as http.
+
+Driver Selection
+----------------
+
+The ``--drivers`` option allows you to specify which switch drivers to install.
+Switch drivers are Python modules that send the switch Selections to the switch hardware.
+A default set of driver is  in ``worckvm.drivers.mock``. These two drivers are
+    mock: A mock driver that simulates the switch hardware
+    mockhid: A mock driver that simulates the HID switch hardware
+
+The two drivers are actually identical and have no actual hardware dependencies, or
+actions but are useful for testing and development.
