@@ -22,11 +22,5 @@ def select(monitor, source):
 
 def list_monitor() -> List[ser.Monitor]:
     return [
-        ser.Monitor(
-            name="",
-            uuid=m.uuid,
-            status=ser.MonitorStatus.of(m),
-            neighbours=m.neighbours
-        )
-        for m in Monitor.list()
+        ser.Monitor(m) for m in Monitor.list()
     ]

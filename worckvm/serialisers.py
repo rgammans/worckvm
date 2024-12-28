@@ -26,4 +26,17 @@ class Monitor(BaseModel):
     name: str
     uuid: uuid.UUID
     status: MonitorStatus
-    neighbours: dict[monitor.Adjacency, 'Monitor']
+    # We can't expand monitor's here as it's a dually linked
+    # list which would expand to infinite depth.
+    neighbours: dict[monitor.Adjacency, uuid.UUID]
+
+    def __init__(self, *args, **kwargs):
+        # If the first argument is a monitor, construct from that.
+        if len(args) > 0 and isinstance(m := args[0], monitor.Monitor):
+            return super().__init__(
+                name=m.name,
+                uuid=m.uuid,
+                status=MonitorStatus.of(m),
+                neighbours={k: v.uuid for k, v in m.neighbours.items()},
+            )
+        return super().__init__(*args, **kwargs)
