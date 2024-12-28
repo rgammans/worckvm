@@ -66,6 +66,21 @@ def build_matrix(loader, node):
     return m
 
 
+@yaml_tag("MatrixDriver")
+def build_driver(loader, node):
+    """
+    YAML constructor to build and register Driver instances from the YAML configuration.
+    """
+    data = loader.construct_mapping(node)
+    name = data.get('name')
+    if not name:
+        raise ValueError("Driver definition must include a 'name' field.")
+
+    # Create and register the Driver instance
+    driver = Driver(name=name)
+    return driver
+
+
 @yaml_tag("MatrixOutput")
 def get_matrix_output(loader, node):
     data = loader.construct_mapping(node)
@@ -74,6 +89,7 @@ def get_matrix_output(loader, node):
         return m.outputs[data['output_idx']]
     except KeyError as e:
         raise MissingConfigKey(*e.args)
+    
 
 @yaml_tag("MatrixInput")
 class MatrixInputProxy:
@@ -83,6 +99,7 @@ class MatrixInputProxy:
         self.idx = data['input_idx']
 
     def set_to(self, src):
+        print(self.idx)
         if self.matrix.inputs[self.idx] is not None:
             raise DuplicateConnection()
         self.matrix.replug_input(self.idx, src)

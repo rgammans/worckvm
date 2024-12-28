@@ -1,7 +1,6 @@
-from worckvm.http_app import app  # noqa: F401
-from worckvm.matrixdriver import Driver
-from worckvm.config import loads
-
+from .http_app import app  # noqa: F401
+from .matrixdriver import Driver
+from .config import loads
 
 
 class TestDriver(Driver):

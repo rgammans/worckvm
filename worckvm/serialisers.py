@@ -1,8 +1,7 @@
 import uuid
-from typing import Union
+from typing import Union, Dict
 from . import monitor
-from pydantic import BaseModel
-
+from pydantic import BaseModel, SerializeAsAny
 
 class Source(BaseModel):
     uuid: uuid.UUID
@@ -28,7 +27,7 @@ class Monitor(BaseModel):
     status: MonitorStatus
     # We can't expand monitor's here as it's a dually linked
     # list which would expand to infinite depth.
-    neighbours: dict[monitor.Adjacency, uuid.UUID]
+    neighbours: Dict[monitor.Adjacency, uuid.UUID]
 
     def __init__(self, *args, **kwargs):
         # If the first argument is a monitor, construct from that.

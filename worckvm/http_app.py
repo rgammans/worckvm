@@ -1,6 +1,7 @@
 import uuid
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.convertors import Convertor, register_url_convertor
 from worchestic.signals import Source
 from . import api
@@ -38,6 +39,15 @@ register_url_convertor("Source", SourceConverter)  # noqa: E305
 
 
 app = FastAPI()
+
+# added to allow expo web to work on local machine
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
 
 @app.exception_handler(WorcKVMError)

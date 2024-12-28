@@ -1,0 +1,129 @@
+# Hardware configuration file.
+matrix:
+  - !Matrix &video_a
+    name: "video_a"
+    driver: "mock"
+    nr_inputs: 6
+    nr_outputs: 2
+  
+  - !Matrix &video_b
+    name: "video_b"
+    driver: "mock"
+    nr_inputs: 6
+    nr_outputs: 2
+
+  - !Matrix &hid_matrix
+    name: "hid"
+    driver: "mockhid"
+    nr_inputs: 6
+    nr_outputs: 1
+
+connections:
+  - !MatrixOutput &leftvideo
+    matrix_name: "video_a"
+    output_idx: 0
+
+  - !MatrixOutput &rightvideo
+    matrix_name: "video_b"
+    output_idx: 1
+
+  - !MatrixOutput &hid
+    matrix_name: "hid"
+    output_idx: 0
+
+  - !MatrixGroup &grp
+    matricies:
+      - video_a
+      - video_b
+      - hid
+    sources:
+      - !SourceSet
+        name: "Linux PC"
+        sources:
+            - type: "video_left"
+              preferred_output: *leftvideo
+              connected_to: !MatrixInput
+                matrix_name: "video_a"
+                input_idx: 0
+
+            - type: "video_right"
+              preferred_output: *rightvideo
+              connected_to: !MatrixInput
+                matrix_name: "video_b"
+                input_idx: 1
+
+            - type: "hid"
+              preferred_output: *hid
+              connected_to: !MatrixInput
+                matrix_name: "hid"
+                input_idx: 0
+
+
+      - !SourceSet
+        name: "Macintosh"
+        sources:
+            - type: "video_left"
+              preferred_output: *leftvideo
+              connected_to: !MatrixInput
+                matrix_name: "video_a"
+                input_idx: 2
+
+            - type: "video_right"
+              preferred_output: *rightvideo
+              connected_to: !MatrixInput
+                matrix_name: "video_b"
+                input_idx: 3
+
+            - type: "hid"
+              preferred_output: *hid
+              connected_to: !MatrixInput
+                matrix_name: "hid"
+                input_idx: 1
+
+      - !SourceSet
+        name: "Gaming PC"
+        sources:
+            - type: "video_left"
+              preferred_output: *leftvideo
+              connected_to: !MatrixInput
+                matrix_name: "video_a"
+                input_idx: 4
+
+            - type: "hid"
+              preferred_output: *hid
+              connected_to: !MatrixInput
+                matrix_name: "hid"
+                input_idx: 2
+
+      - !SourceSet &laptop
+        name: "Laptop"
+        sources:
+            - type: "video_right"
+              preferred_output: *rightvideo
+              connected_to: !MatrixInput
+                matrix_name: "video_b"
+                input_idx: 5
+
+            - type: "hid"
+              preferred_output: *hid
+              connected_to: !MatrixInput
+                matrix_name: "hid"
+                input_idx: 4
+  
+  - !Monitor &left_monitor
+    name: "Left monitor"
+    matrix_group: *grp
+    connected_to: *leftvideo
+    hid_output: *hid
+    
+
+  - !Monitor &right_monitor
+    name: "Right monitor"
+    matrix_group: *grp
+    connected_to: *rightvideo
+    hid_output: *hid
+    to_left: *left_monitor
+
+
+
+
