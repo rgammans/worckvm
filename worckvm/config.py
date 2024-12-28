@@ -99,7 +99,6 @@ class MatrixInputProxy:
         self.idx = data['input_idx']
 
     def set_to(self, src):
-        print(self.idx)
         if self.matrix.inputs[self.idx] is not None:
             raise DuplicateConnection()
         self.matrix.replug_input(self.idx, src)
