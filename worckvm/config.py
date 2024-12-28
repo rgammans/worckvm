@@ -20,7 +20,8 @@ class MissingConfigKey(ValueError):
     """An expected value was missing from a config object"""
 
 class NoSuchMatrix(KeyError):
-    """Cant find a  matcging amtrix"""
+    """Cant find a  matching matrix"""
+
 
 class DuplicateSourceType(ValueError):
     """A sourceset can only contain a single source of each type"""
