@@ -22,6 +22,9 @@ class MissingConfigKey(ValueError):
 class NoSuchMatrix(KeyError):
     """Cant find a  matching matrix"""
 
+class UnknownDriver(KeyError):
+    """Cant find the named driver"""
+
 
 class DuplicateSourceType(ValueError):
     """A sourceset can only contain a single source of each type"""
@@ -53,9 +56,12 @@ def build_matrix(loader, node):
     data = loader.construct_mapping(node)
     name = data.get('name')
     namestr = data.get('name', "<Matrix:unknown")
-    driver = None
-    with suppress(KeyError):
+
+    try:
         driver = Driver.get(data.get('driver'))
+    except KeyError as e:
+        raise UnknownDriver(*e.args)
+
     m = Matrix(
         namestr,
         driver,
