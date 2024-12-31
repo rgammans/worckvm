@@ -1,0 +1,12 @@
+.*\.py[co~]$
+.*~
+.*.sw[mnop]
+generated/.*
+build/.*
+*.egg-info/
+dist/
+*.orig
+*.old
+\.tox/*
+
+venv/
