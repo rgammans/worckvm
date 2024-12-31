@@ -53,6 +53,16 @@ def yaml_tag(name: str):
 
 @yaml_tag("Matrix")
 def build_matrix(loader, node):
+    """Yaml Matrix constructor
+    
+    A matrix is a device that can switch multiple inputs to multiple outputs, it has 
+    a name, a driver, a number of inputs and a number of outputs.
+    Sub tags:
+    - name: str
+    - driver: str
+    - nr_inputs: int
+    - nr_outputs: int
+    """
     data = loader.construct_mapping(node)
     name = data.get('name')
     namestr = data.get('name', "<Matrix:unknown")
@@ -73,23 +83,13 @@ def build_matrix(loader, node):
     return m
 
 
-@yaml_tag("MatrixDriver")
-def build_driver(loader, node):
-    """
-    YAML constructor to build and register Driver instances from the YAML configuration.
-    """
-    data = loader.construct_mapping(node)
-    name = data.get('name')
-    if not name:
-        raise ValueError("Driver definition must include a 'name' field.")
-
-    # Create and register the Driver instance
-    driver = Driver(name=name)
-    return driver
-
-
 @yaml_tag("MatrixOutput")
 def get_matrix_output(loader, node):
+    """Create a reference to a matrix output
+    It has the following sub tags:
+    - matrix_name: str
+    - output_idx: int - The index of the output to reference 
+    """
     data = loader.construct_mapping(node)
     try:
         m = get_matrix(data['matrix_name'])
@@ -100,6 +100,12 @@ def get_matrix_output(loader, node):
 
 @yaml_tag("MatrixInput")
 class MatrixInputProxy:
+    """Create a reference to a matrix input
+    It has the following sub tags:
+    - matrix_name: str
+    - input_idx: int - The index of the input to reference 
+    - connected_to: MatrixOutput - The output this input is connected to
+    """
     def __init__(self, loader, node):
         data = loader.construct_mapping(node)
         self.matrix = get_matrix(data['matrix_name'])
@@ -113,6 +119,11 @@ class MatrixInputProxy:
 
 @yaml_tag("MatrixGroup")
 def matrixgroup(loader, node):
+    """Create a group of matrices and sources
+    It has the following sub tags:
+    - matrices: List[str] - A list of matrix names
+    - sources: List[SourceSet] - A list of sourcesets
+    """
     data = loader.construct_mapping(node, deep=True)
     mats = {}
 
@@ -137,6 +148,11 @@ def matrixgroup(loader, node):
 
 @yaml_tag("Layout")
 def set_layout(loader, node):
+    """Set the physical layout of a monitors and their neighbours
+    It has the following sub tags:
+    - monitor: Monitor - The main monitor
+    - to_{direction}: Monitor - reference to the monitor in the direction of {direction}
+    """
     data = loader.construct_mapping(node, deep=True)
     main_monitor = data['monitor']
 
@@ -150,6 +166,13 @@ def set_layout(loader, node):
 
 @yaml_tag("Monitor")
 def make_monitor(loader, node):
+    """Create a monitor object
+    It has the following sub tags:
+    - name: str - The name of the monitor
+    - matrix_group: MatrixGroup - The Matrix group which the monitor is connected to
+    - connected_to: MatrixOutput - The video output of the connected matrix
+    - hid_output: MatrixOutput - The hid output, relevant to users looking at this monitor
+    """
     data = loader.construct_mapping(node, deep=True)
     matrixgrp = data['matrix_group']
 
@@ -180,7 +203,21 @@ def make_monitor(loader, node):
 
 @yaml_tag("SourceSet")
 class SourceSet:
-    ""
+    """Create a set of sources
+    It has the following sub tags:
+    - name: str - The name of the sourceset
+    - sources: List[Source] - A list of sources in this set
+    
+    A source type, is a unique identifier for a source, and is used to group
+    sources together. Sources in a group are are routed by preference to the
+    same output.
+
+    Each source has the following sub tags:
+    - type: str - The type of the source; for grouping and auto follow.
+    - name: str - The name of the source
+    - preferred_output: str - The preferred output for this source
+    - connected_to: MatrixInput - The input this source is connected to.
+    """
     def __init__(self, loader, node):
         data = loader.construct_mapping(node, deep=True)
         self.name = data['name']
