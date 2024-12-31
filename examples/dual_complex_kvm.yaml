@@ -32,7 +32,7 @@ connections:
     output_idx: 0
 
   - !MatrixGroup &grp
-    matricies:
+    matrices:
       - video_a
       - video_b
       - hid
