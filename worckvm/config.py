@@ -110,6 +110,10 @@ class MatrixInputProxy:
         data = loader.construct_mapping(node)
         self.matrix = get_matrix(data['matrix_name'])
         self.idx = data['input_idx']
+        if connection := data.get('connected_to'):
+            # Connection is expected to in a MatrixOutput, although
+            # a source should also be able to connect to an input
+            self.set_to(connection)
 
     def set_to(self, src):
         if self.matrix.inputs[self.idx] is not None:
