@@ -54,12 +54,15 @@ def yaml_tag(name: str):
 @yaml_tag("Matrix")
 def build_matrix(loader, node):
     """Yaml Matrix constructor
-    
-    A matrix is a device that can switch multiple inputs to multiple outputs, it has 
-    a name, a driver, a number of inputs and a number of outputs.
+
+    A matrix is a device that can switch multiple inputs to multiple
+    outputs, it has a name, a driver, a number of inputs and a number
+    of outputs.
+
     Sub tags:
-    - name: str
-    - driver: str
+    - name: str  - Used in error messages, and user-facing labels.
+    - driver: str - Name of 'registered' instance of an object implementing
+                    the driver protocol
     - nr_inputs: int
     - nr_outputs: int
     """
