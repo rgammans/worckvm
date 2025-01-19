@@ -117,7 +117,7 @@ class MatrixInputProxy:
 
     def set_to(self, src):
         if self.matrix.inputs[self.idx] is not None:
-            raise DuplicateConnection()
+            raise DuplicateConnection(f"Input used twice {self.matrix.name}|{self.idx}")
         self.matrix.replug_input(self.idx, src)
 
 
