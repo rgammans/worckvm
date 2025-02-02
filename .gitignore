@@ -9,4 +9,6 @@ dist/
 *.old
 \.tox/*
 
+**/__pycache__/
+
 venv/
