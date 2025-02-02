@@ -10,6 +10,8 @@ from worckvm import config
 from worckvm.monitor import Monitor, Adjacency
 from worckvm.matrixdriver import Driver
 
+driver = Driver(name="test_driver")
+
 class ConfigTest(TestCase):
     def setUp(self):
         self.base_matrix = """
@@ -17,6 +19,7 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 """
 
     def test_matrix_creation(self):
@@ -32,6 +35,7 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 6
   nr_outputs: 2
+  driver: test_driver
 """)[0]
         print("ls", repr(system))
         self.assertTrue(isinstance(system, Matrix))
@@ -39,7 +43,6 @@ class ConfigTest(TestCase):
         self.assertEqual(len(system.outputs), 2)
 
     def test_matrix_creation_with_driver(self):
-        driver = Driver(name="test_driver")
         system = config.loads("""
 - !Matrix
   name: "video"
@@ -57,6 +60,7 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 6
   nr_outputs: 2
+  driver: test_driver
 - !MatrixOutput
   matrix_name: "video"
   output_idx: 1
@@ -72,6 +76,7 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 6
   nr_outputs: 2
+  driver: test_driver
 - !MatrixOutput
   matrix_name: "video"
   ouput_idx: 1
@@ -97,6 +102,7 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 6
   nr_outputs: 2
+  driver: test_driver
 - !MatrixInput
   matrix_name: "video"
   input_idx: 1
@@ -112,6 +118,7 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 6
   nr_outputs: 2
+  driver: test_driver
 - !MatrixInput
   matrix_name: "video"
   input_idx: 1
@@ -136,11 +143,13 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !Matrix
   name: "hid"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !MatrixOutput &video
   matrix_name: "video"
@@ -197,6 +206,7 @@ class ConfigTest(TestCase):
         cfg = dedent("""
             - !Matrix
               name: "video"
+              driver: test_driver
               nr_inputs: 4
               nr_outputs: 1
 
@@ -215,11 +225,13 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !Matrix
   name: "hid"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !MatrixOutput &video
   matrix_name: "video"
@@ -278,11 +290,13 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !Matrix
   name: "hid"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !MatrixOutput &video
   matrix_name: "video"
@@ -344,16 +358,19 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !Matrix
   name: "alt"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !Matrix
   name: "hid"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !MatrixOutput &video
   matrix_name: "video"
@@ -413,11 +430,13 @@ class ConfigTest(TestCase):
   name: "video"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !Matrix
   name: "hid"
   nr_inputs: 4
   nr_outputs: 1
+  driver: test_driver
 
 - !MatrixOutput &video
   matrix_name: "video"
