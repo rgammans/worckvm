@@ -1,4 +1,5 @@
 import uuid
+import os
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -70,8 +71,9 @@ def set_options(parser):
     parser.add_argument("--port", type=int, default=8000, help="The port to bind to.")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload.")
     parser.add_argument("--workers", type=int, default=1, help="Number of worker processes.")
-    parser.add_argument("--log-level", type=str, default="info", help="Log level.")
+    #parser.add_argument("--log-level", type=str, default="info", help="Log level.")
     parser.add_argument("--ssl-keyfile", type=str, help="SSL key file.")
+    parser.add_argument("--ssl-keyfile-password", type=str, help="Password to unloick SSL key file.", default=os.getenv("SSL_PASSWORD"))
     parser.add_argument("--ssl-certfile", type=str, help="SSL certificate file.")
     parser.add_argument("--ssl-version", type=str, help="SSL version.")
     parser.add_argument("--ssl-cert-reqs", type=str, help="SSL certificate requests.")
@@ -81,9 +83,9 @@ def set_options(parser):
     parser.add_argument("--root-path", type=str, help="Root path.")
     parser.add_argument("--limit-concurrency", type=int, help="Limit concurrency.")
     parser.add_argument("--timeout-keep-alive", type=int, help="Timeout keep alive.")
-    parser.add_argument("--graceful-timeout", type=int, help="Graceful timeout.")
+    parser.add_argument("--timeout-graceful-shutdown", type=int, help="Graceful timeout.")
     parser.add_argument("--limit-max-requests", type=int, help="Limit max requests.")
-    parser.add_argument("--limit-max-requests-jitter", type=int, help="Limit max requests jitter.")
+    #parser.add_argument("--limit-max-requests-jitter", type=int, help="Limit max requests jitter.")
     parser.add_argument("--reload-dir", type=str, help="Reload dir.")
     parser.add_argument("--reload-delay", type=float, help="Reload delay.")
     parser.add_argument("--ws-ping-interval", type=int, help="WS ping interval.")
@@ -95,4 +97,8 @@ def set_options(parser):
 
 
 def run(**kwargs):
-    uvicorn.run(app, **kwargs)
+    args = {}
+    for k ,v in kwargs.items():
+        if v is not None:
+            args[k] = v
+    uvicorn.run(app, **args)
