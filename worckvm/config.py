@@ -8,7 +8,7 @@ from worchestic.matrix import Matrix
 from worchestic.group import SourceGroup, MatrixGroup
 from worchestic.signals import Source
 from .monitor import Monitor, Adjacency
-from .matrixdriver import Driver
+from . import driver_registry
 
 _matrixes = {}
 
@@ -31,6 +31,7 @@ class DuplicateSourceType(ValueError):
 
 class MatrixNotInGroup(ValueError):
     """A Monitor's video must be connected to a matrix in it's matrixgroup"""
+
 
 def set_matrix(name, matrix):
     global _matrixes
@@ -56,9 +57,8 @@ def build_matrix(loader, node):
     data = loader.construct_mapping(node)
     name = data.get('name')
     namestr = data.get('name', "<Matrix:unknown")
-
     try:
-        driver = Driver.get(data.get('driver'))
+        driver = driver_registry.get(data.get('driver'))
     except KeyError as e:
         raise UnknownDriver(*e.args)
 
