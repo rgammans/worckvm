@@ -3,23 +3,30 @@ from functools import cached_property
 import worckvm.config as config
 import pkgutil
 import pathlib
+import logging
+import copy
+import contextlib
 
-#import worckvm.drivers.mock
+
+logger = logging.getLogger(__name__)
+
 
 DEFAULT_CONFIG_FILE = 'matrix.yml'
 
 def _available_modes():
     modules = {}
     for module in pkgutil.iter_modules([pathlib.Path(__file__).parent]):
-        if module.name.endswith('app'):
+        if module.name.endswith('_app'):
+            logger.debug(f"loading {module.name}")
             try:
                 appmod = __import__('worckvm.' + module.name, fromlist=['worckvm'])
                 modules[module.name[:-4]] = appmod
-            except ImportError:
-                pass
+            except ImportError as e:
+                logger.warning(f"\tfailed to load {module.name}:{e}")
     return modules
 
 Modes = _available_modes()
+logger.info(f"Available modes {Modes.keys()}")
 
 def get_parser():
     parser = argparse.ArgumentParser(description='A KVM Switch fabric manager')
