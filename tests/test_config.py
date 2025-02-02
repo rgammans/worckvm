@@ -8,9 +8,11 @@ from worchestic.group import SourceGroup, MatrixGroup
 
 from worckvm import config
 from worckvm.monitor import Monitor, Adjacency
-from worckvm.matrixdriver import Driver
+from worckvm import driver_registry
 
-driver = Driver(name="test_driver")
+
+driver = object()
+driver_registry.register(driver, "test_driver")
 
 class ConfigTest(TestCase):
     def setUp(self):
