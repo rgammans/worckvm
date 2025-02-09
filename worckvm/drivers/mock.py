@@ -3,12 +3,14 @@
 # without real hardware.
 #
 
-from ..matrixdriver import Driver
+from worchestic.matrix import MatrixDriver
+from ..driver_registry import register
 
-class TestDriver(Driver):
+
+class TestDriver(MatrixDriver):
     def select(self, inp, out):
         return None
 
 
-mockdriver = TestDriver(name="mock")
-mockdriver = TestDriver(name="mockhid")
+register(TestDriver(), name="mock")
+register(TestDriver(), name="mockhid")
