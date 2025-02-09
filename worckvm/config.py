@@ -136,7 +136,7 @@ def matrixgroup(loader, node):
 
     # Process matricies
     try:
-        for matrix_name in data['matricies']:
+        for matrix_name in data['matrices']:
             mats[matrix_name] = get_matrix(matrix_name)
     except KeyError as e:
         raise MissingConfigKey(*e.args)
