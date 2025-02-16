@@ -244,7 +244,7 @@ class ConfigTest(TestCase):
   output_idx:  0
 
 - !MatrixGroup
-  matricies: [ "video", "hid" ]
+  matrices: [ "video", "hid" ]
   sources:
   - !SourceSet
     name: "Gaming PC"
@@ -279,8 +279,8 @@ class ConfigTest(TestCase):
 
 
   """)
-        self.assertEqual(set(system[4].matricies.keys()), {"video", 'hid'})
-        self.assertEqual(system[4].matricies['video'], system[0])
+        self.assertEqual(set(system[4].matrices.keys()), {"video", 'hid'})
+        self.assertEqual(system[4].matrices['video'], system[0])
         self.assertEqual(set(system[4].signals.groups.keys()),
                          {"video", "hid"})
         self.assertEqual(system[4].signals.groups['video'][0].name,
@@ -309,7 +309,7 @@ class ConfigTest(TestCase):
   output_idx:  0
 
 - !MatrixGroup &grp
-  matricies: [ "video", "hid" ]
+  matrices: [ "video", "hid" ]
   sources:
   - !SourceSet
     name: "Gaming PC"
@@ -383,7 +383,7 @@ class ConfigTest(TestCase):
   output_idx:  0
 
 - !MatrixGroup &grp
-  matricies: [ "video", "hid" ]
+  matrices: [ "video", "hid" ]
   sources:
   - !SourceSet
     name: "Gaming PC"
@@ -449,7 +449,7 @@ class ConfigTest(TestCase):
   output_idx:  0
 
 - !MatrixGroup &grp
-  matricies: [ "video", "hid" ]
+  matrices: [ "video", "hid" ]
   sources:
   - !SourceSet
     name: "Gaming PC"

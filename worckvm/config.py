@@ -184,7 +184,7 @@ def make_monitor(loader, node):
     matrixgrp = data['matrix_group']
 
     def find_matrix_groupname(output):
-        for name, mat in matrixgrp.matricies.items():
+        for name, mat in matrixgrp.matrices.items():
             if mat is output.port[0]:
                 return name
         else:

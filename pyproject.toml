@@ -15,7 +15,7 @@ classifiers = [
     "Topic :: Other/Nonlisted Topic"
 ]
 dependencies = [
-    "worchestic",
+    "worchestic>=0.3.0",
     "pyyaml",
     "pydantic",
 ]
